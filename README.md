@@ -1,2 +1,2 @@
 # solipsism
-Game-world database for brining real-time multi-user support to your VR metaverse!
+Game-world database for bringing real-time multi-user support to your VR metaverse!
