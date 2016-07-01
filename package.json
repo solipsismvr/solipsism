@@ -1,0 +1,23 @@
+{
+  "name": "solipsism",
+  "version": "0.0.1",
+  "description": "Game-world database for bringing real-time multi-user support to your VR metaverse",
+  "main": "src/Solipsism.js",
+  "scripts": {
+    "test": "tape tests/*.js | tap-spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/sminnee/solipsism.git"
+  },
+  "author": "Sam Minnee <sam.minnee@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sminnee/solipsism/issues"
+  },
+  "homepage": "https://github.com/sminnee/solipsism",
+  "devDependencies": {
+    "tap-spec": "^4.1.1",
+    "tape": "^4.6.0"
+  }
+}
