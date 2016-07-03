@@ -33,9 +33,9 @@ To start with, you can run single GameWorld in your browser's main thread. Creat
 to create projects in it.
 
 ```js
-var Solipsism = require('solipsism');
+var Sol = require('solipsism');
 
-var world = new Solipsism.GameWorld('Client');
+var world = new Sol.GameWorld('Client');
 
 world.add({
   type: 'light',
@@ -81,10 +81,10 @@ you will use Three.js. A ThreeBinding object can connect your GameWorld to a THR
 be synchronised into your scene, and from there, the rest is up to you.
 
 ```js
-var Solipsism = require('solipsism');
+var Sol = require('solipsism');
 var scene = new THREE.Scene();
-var world = new Solipsism.GameWorld('Client');
-world.addBinding(new Solipsism.ThreeBinding(scene))
+var world = new Sol.GameWorld('Client');
+world.addBinding(new Sol.ThreeBinding(scene))
 ```
 
 We assume you are familiar with THREE.js (if not, google for some tutorials), but here's a simple script to add a
@@ -168,10 +168,10 @@ provdies integration with the Ammo.js physics engine.
 To add physics to your scene, first set up the binding:
 
 ```
-var Solipsism = require('solipsism');
+var Sol = require('solipsism');
 var AmmoBinding = require('solipsism-ammo');
 
-var world = new Solipsism.GameWorld('Client');
+var world = new Sol.GameWorld('Client');
 var physics = new AmmoBinding();
 world.add(physics);
 ```
@@ -202,9 +202,9 @@ This simple server is a good place to start.
 ```js
 var express = require('express');
 var socket = require('socket.io');
-var Solipsism = require('solipsism');
+var Sol = require('solipsism');
 
-var world = new Solipsism.GameWorld('Server');
+var world = new Sol.GameWorld('Server');
 
 // Create your gameworld
 world.add(...);
@@ -216,20 +216,20 @@ var io = socket(server);
 server.listen(3001);
 
 // Set up a game server
-var gameServer = new Solipsism.GameServer(world);
+var gameServer = new Sol.GameServer(world);
 io.on('connection', gameServer.addSocketClient.bind(gameServer));
 ```
 
 Your client can be updated by replacing the `world.add()` commands with a Socket.io connection.
 
 ```js
-var Solipsism = require('solipsism');
+var Sol = require('solipsism');
 var io = require('socket.io');
 
-var world = new Solipsism.GameWorld('Client');
+var world = new Sol.GameWorld('Client');
 
 var socket = io.connect('http://' + window.location.hostname + ':3001');
-var sync = new Solipsism.WorldSyncer(world);
+var sync = new Sol.WorldSyncer(world);
 sync.connect(new WorldSyncer.Socket(socket));
 ```
 

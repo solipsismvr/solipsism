@@ -1,7 +1,7 @@
 var test = require('tape');
 
 test("Solipsism", function (t) {
-  var Solipsism = require('../src/Solipsism');
-  new Solipsism();
+  var Sol = require('../src/Solipsism');
+  new Sol();
   t.end();
 })
