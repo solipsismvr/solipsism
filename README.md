@@ -82,10 +82,9 @@ be synchronised into your scene, and from there, the rest is up to you.
 
 ```js
 var Solipsism = require('solipsism');
-var ThreeBinding = require('solipsism-three');
 var scene = new THREE.Scene();
 var world = new Solipsism.GameWorld('Client');
-world.addBinding(new ThreeBinding(scene))
+world.addBinding(new Solipsism.ThreeBinding(scene))
 ```
 
 We assume you are familiar with THREE.js (if not, google for some tutorials), but here's a simple script to add a

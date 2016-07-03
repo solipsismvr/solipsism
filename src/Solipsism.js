@@ -7,5 +7,7 @@ module.exports = {
 
   WorkerSyncer: require('./WorldSyncer').Worker,
   WorkerParentSyncer: require('./WorldSyncer').WorkerParent,
-  SocketSyncer:  require('./WorldSyncer').Socket
+  SocketSyncer:  require('./WorldSyncer').Socket,
+
+  ThreeBinding: require('./ThreeBinding'),
 };
