@@ -162,7 +162,34 @@ world.add({
 Adding physics
 --------------
 
-coming soon...
+As well as rendering scenes, bindings can also be used to incorporate physics. A separate package, `silverstripe-ammo`,
+provdies integration with the Ammo.js physics engine.
+
+To add physics to your scene, first set up the binding:
+
+```
+var Solipsism = require('solipsism');
+var AmmoBinding = require('solipsism-ammo');
+
+var world = new Solipsism.GameWorld('Client');
+var physics = new AmmoBinding();
+world.add(physics);
+```
+
+Then you will need to call the binding's `step()` function at a reasonable framerate:
+
+```
+// Run the physics engine at 50 FPS
+var lastTime = (new Date()).getTime();
+function step() {
+  setTimeout(step, 20);
+
+  var thisTime = (new Date()).getTime();
+  physics.step(thisTime - lastTime);
+  lastTime = thisTime;
+}
+
+```
 
 Client-server operation
 -----------------------
