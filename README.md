@@ -70,7 +70,7 @@ properties are as follows:
  * material: The visible material of a body.
  * position: A 3-element array (`[x, y, z]`) of the object's position.
  * quaternion: A 4-element array (`[x, y, z, w]`) of a quaternion representing the object's orientation.
- * velcity: A 3-element array of the object's velocity.
+ * velocity: A 3-element array of the object's velocity.
  * angularVelocity: A 3-element array of the object's angular velocity.
  * mass: The mass of an object for physics simulations
 
