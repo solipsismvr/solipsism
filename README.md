@@ -84,7 +84,7 @@ be synchronised into your scene, and from there, the rest is up to you.
 var Sol = require('solipsism');
 var scene = new THREE.Scene();
 var world = new Sol.GameWorld('Client');
-world.addBinding(new Sol.ThreeBinding(scene))
+world.addBinding(new Sol.ThreeBinding(require('three'), scene))
 ```
 
 We assume you are familiar with THREE.js (if not, google for some tutorials), but here's a simple script to add a

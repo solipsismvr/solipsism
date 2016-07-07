@@ -26,7 +26,9 @@ function GameWorld(identifier) {
  * A binding will give the GameWorld form, e.g. a ThreeJS or CannonJS binding.
  */
 GameWorld.prototype.addBinding = function (binding, identifier) {
-  binding.identifier = identifier;
+  if(identifier) {
+    binding.identifier = identifier;
+  }
   binding.bindTo(this);
   this.bindings.push(binding);
 }

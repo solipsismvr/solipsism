@@ -40,6 +40,13 @@ GameObject.prototype.batchCreate = function(properties, options) {
 }
 
 /**
+ * Return the linked object related to a given binding
+ */
+GameObject.prototype.getLinkedObject = function (bindingIdentfier) {
+  return this.linkedObjects[bindingIdentfier];
+}
+
+/**
  * Remove this object from the game world
  */
 GameObject.prototype.delete = function(options) {
