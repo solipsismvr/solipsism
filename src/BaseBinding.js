@@ -15,6 +15,13 @@ BaseBinding.prototype.bindTo = function () {
  * If type is 'default' this will be used when no type is specified
  */
 BaseBinding.prototype.addObjectType = function (name, handler) {
+  this.objectTypeHandlers[name] = function (properties, callback) {
+    var mesh = (handler.bind(this))(properties);
+    callback(mesh);
+  }
+}
+
+BaseBinding.prototype.addObjectTypeLoader = function (name, handler) {
   this.objectTypeHandlers[name] = handler;
 }
 
@@ -56,22 +63,27 @@ BaseBinding.prototype.addToGameObject = function (gameObject, properties) {
   var type = properties.type || 'default';
   var propertiesWithoutType = Object.assign({}, properties);
   delete propertiesWithoutType.type;
-  if (this.objectTypeHandlers[type]) {
-    mesh = (this.objectTypeHandlers[type].bind(this))(propertiesWithoutType);
-  } else {
+  if (!this.objectTypeHandlers[type]) {
     throw new Error('Bad GameObject type: ' + type);
   }
 
-  mesh.gameObject = gameObject;
   if (!gameObject.linkedObjects) {
     gameObject.linkedObjects = {};
   }
 
-  gameObject.linkedObjects[this.identifier] = mesh;
+  var self = this;
 
-  this.updateGameObject(gameObject, properties);
+  // Call the handler passing a callback method to complete the rest
+  (this.objectTypeHandlers[type].bind(this))(propertiesWithoutType, function (mesh) {
+    mesh.gameObject = gameObject;
+    gameObject.linkedObjects[self.identifier] = mesh;
 
-  this.onAddObject(gameObject, mesh);
+    self.updateGameObject(gameObject, properties);
+
+    self.onAddObject(gameObject, mesh);
+
+    gameObject.emit('linkToBinding:' + self.identifier, mesh);
+  });
 }
 
 /**

@@ -1,3 +1,5 @@
+var ee = require('event-emitter');
+
 /**
  * Single shape in a GameWorld
  */
@@ -6,6 +8,8 @@ function GameObject(world, properties, id, owner) {
   this.properties = properties;
   this.id = id ? id : world.getNextId();
   this.owner = owner ? owner : world.identifier;
+
+  this.emitter = ee({});
 
   if(!this.owner) {
     throw new Error("GameObject created without owner");
@@ -47,6 +51,18 @@ GameObject.prototype.getLinkedObject = function (bindingIdentfier) {
 }
 
 /**
+ * Pass the linked object to the given callback, once it's ready
+ */
+GameObject.prototype.withLinkedObject = function (bindingIdentfier, callback) {
+  if (this.linkedObjects[bindingIdentfier]) {
+    callback(this.linkedObjects[bindingIdentfier]);
+  } else {
+    this.once('linkToBinding:' + bindingIdentfier, callback);
+  }
+  return this.linkedObjects[bindingIdentfier];
+}
+
+/**
  * Remove this object from the game world
  */
 GameObject.prototype.delete = function(options) {
@@ -60,6 +76,38 @@ GameObject.prototype.delete = function(options) {
     var emitWorldChange = (options && options.emitWorldChange) ? options.emitWorldChange : this.world.emitWorldChange.bind(this.world);
     emitWorldChange({ type: 'remove', id: this.id, owner: this.owner });
   }
+}
+
+
+
+/**
+ * Bind to an event
+ * The following events will work
+ *  - 'linkToBinding:<binding-id>': Return the new linked object for the given binding
+ */
+GameObject.prototype.on = function(event, callback) {
+  this.emitter.on(event, callback);
+}
+
+/**
+ * Trigger an event once
+ */
+GameObject.prototype.once = function(event, callback) {
+  this.emitter.once(event, callback);
+}
+
+/**
+ * Unbind an event
+ */
+GameObject.prototype.off = function(event, callback) {
+  this.emitter.off(event, callback);
+}
+
+/**
+ * Emit an event
+ */
+GameObject.prototype.emit = function(event, data) {
+  this.emitter.emit(event, data);
 }
 
 module.exports = GameObject;
