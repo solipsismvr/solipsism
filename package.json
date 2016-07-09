@@ -21,6 +21,7 @@
     "tape": "^4.6.0"
   },
   "dependencies": {
-    "event-emitter": "^0.3.4"
+    "event-emitter": "^0.3.4",
+    "util": "^0.10.3"
   }
 }

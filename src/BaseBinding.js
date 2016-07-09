@@ -1,5 +1,9 @@
+var ee = require('event-emitter');
+
 function BaseBinding (identifier) {
   this.identifier = identifier;
+
+  ee(this);
 
   this.objectTypeHandlers = {}
   this.propertyHandlers = {};
@@ -80,7 +84,7 @@ BaseBinding.prototype.addToGameObject = function (gameObject, properties) {
 
     self.updateGameObject(gameObject, properties);
 
-    self.onAddObject(gameObject, mesh);
+    self.emit('addLinkedObject', mesh);
 
     gameObject.emit('linkToBinding:' + self.identifier, mesh);
   });
@@ -107,21 +111,11 @@ BaseBinding.prototype.updateGameObject = function (gameObject, properties) {
  * @param properties the altered properties
  */
 BaseBinding.prototype.removeGameObject = function (gameObject) {
-  this.onRemoveObject(gameObject, gameObject.linkedObjects[this.identifier]);
+  this.emit('removeLinkedObject', gameObject.linkedObjects[this.identifier]);
 }
 
-/**
- * Called when an object is added
- * Override in your subclass
- */
-BaseBinding.prototype.onAddObject = function (gameObject, linkedObject) {
-}
-
-/**
- * Called when an object is removed
- * Override in your subclass
- */
-BaseBinding.prototype.onRemoveObject = function (gameObject, linkedObject) {
+BaseBinding.prototype.bindTo = function (gameWorld) {
+  this.emit('bind', gameWorld);
 }
 
 
