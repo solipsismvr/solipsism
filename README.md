@@ -264,3 +264,10 @@ Web Workers
 -----------
 
 coming soon...
+
+
+Further reading
+---------------
+
+ * [WebVR extension](https://github.com/sminnee/solipsism-webvr)
+ * [Wire Protocol](docs/wire-protocol.md)
