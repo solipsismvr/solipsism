@@ -31,12 +31,12 @@ test("BaseBinding", function (t) {
 
   // Linking to a global state
   var allObjects = {};
-  b.onAddObject = function (gameObject, linkedObject) {
+  b.on('addLinkedObject', function (linkedObject, gameObject) {
     allObjects[gameObject.properties.name] = linkedObject;
-  }
-  b.onRemoveObject = function (gameObject, linkedObject) {
+  });
+  b.on('removeLinkedObject', function (linkedObject, gameObject) {
     delete allObjects[gameObject.properties.name];
-  }
+  });
 
   // Scaffold a gameworld to test things
   var w = new GameWorld('');
@@ -64,7 +64,15 @@ test("BaseBinding", function (t) {
   });
 
   t.test("updating objects", function (t) {
+    w = new GameWorld('');
+    w.addBinding(b);
+    allObjects = {};
 
+    g1 = w.add({
+      name: 'hello',
+      foo: 'test',
+      bar: { type: 'yes' }
+    });
     g1.update({
       foo: 'another',
       bar: { type: 'no' }
@@ -80,6 +88,16 @@ test("BaseBinding", function (t) {
   });
 
   t.test("removing objects", function (t) {
+    w = new GameWorld('');
+    w.addBinding(b);
+    allObjects = {};
+
+    g1 = w.add({
+      name: 'hello',
+      foo: 'test',
+      bar: { type: 'yes' }
+    });
+
     g2 = w.add({
       name: 'another',
     });
@@ -100,6 +118,5 @@ test("BaseBinding", function (t) {
     t.end();
   });
 
-
   t.end();
-})
+});

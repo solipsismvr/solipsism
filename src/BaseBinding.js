@@ -84,7 +84,7 @@ BaseBinding.prototype.addToGameObject = function (gameObject, properties) {
 
     self.updateGameObject(gameObject, properties);
 
-    self.emit('addLinkedObject', mesh);
+    self.emit('addLinkedObject', mesh, gameObject);
 
     gameObject.emit('linkToBinding:' + self.identifier, mesh);
   });
@@ -111,7 +111,7 @@ BaseBinding.prototype.updateGameObject = function (gameObject, properties) {
  * @param properties the altered properties
  */
 BaseBinding.prototype.removeGameObject = function (gameObject) {
-  this.emit('removeLinkedObject', gameObject.linkedObjects[this.identifier]);
+  this.emit('removeLinkedObject', gameObject.linkedObjects[this.identifier], gameObject);
 }
 
 BaseBinding.prototype.bindTo = function (gameWorld) {
