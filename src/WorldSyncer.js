@@ -37,20 +37,20 @@ WorldSyncer.WorkerParent = function() {
 WorldSyncer.Socket = function(socket) {
 
   this.addMessageHandler = function(handler) {
-    socket.on('worldSync', this.worldSyncListener = function(message) {
+    socket.on('message', this.worldSyncListener = function(message) {
       handler(message);
     });
   };
 
   this.removeMessageHandler = function() {
     if (this.worldChangeListener) {
-      handler.off('worldSync', this.worldSyncListener);
+      handler.off('message', this.worldSyncListener);
       delete this.worldChangeListener;
     }
   }
 
   this.postMessage = function(message) {
-    socket.emit('worldSync', message);
+    socket.send(message);
   };
 
 }
