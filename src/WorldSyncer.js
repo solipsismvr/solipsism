@@ -112,7 +112,6 @@ WorldSyncer.prototype.connect = function (syncInterface, options) {
     var queuedChanges = new ChangeQueue();
     this.interval = setInterval(function() {
       var changes = queuedChanges.flushQueue();
-      console.log('sending changes', changes);
       sendChanges(changes);
     }, appliedOptions.updateInterval);
   }

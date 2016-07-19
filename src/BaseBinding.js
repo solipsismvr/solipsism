@@ -79,10 +79,17 @@ BaseBinding.prototype.addToGameObject = function (gameObject, properties) {
 
   // Call the handler passing a callback method to complete the rest
   (this.objectTypeHandlers[type].bind(this))(propertiesWithoutType, function (mesh) {
+    if(!mesh) {
+      console.log('Missing linkedObject for', gameObject);
+      throw new Error("Couldn't create linkedObject");
+    }
+
     mesh.gameObject = gameObject;
     gameObject.linkedObjects[self.identifier] = mesh;
 
-    self.updateGameObject(gameObject, properties);
+    // We use gameObject.properties rather than properties just in case they have been updated
+    // by the time the loader is called
+    self.updateGameObject(gameObject, gameObject.properties);
 
     self.emit('addLinkedObject', mesh, gameObject);
 
@@ -96,12 +103,15 @@ BaseBinding.prototype.addToGameObject = function (gameObject, properties) {
  */
 BaseBinding.prototype.updateGameObject = function (gameObject, properties) {
   var mesh = gameObject.linkedObjects[this.identifier];
-
   var handler;
-  for(name in this.propertyHandlers) {
-    handler = this.propertyHandlers[name];
-    if (properties[name]) {
-      (handler.bind(this))(mesh, properties[name]);
+
+  // Don't do this if the mesh hasn't been loaded yet
+  if(mesh) {
+    for(name in this.propertyHandlers) {
+      handler = this.propertyHandlers[name];
+      if (properties[name]) {
+        (handler.bind(this))(mesh, properties[name]);
+      }
     }
   }
 }
