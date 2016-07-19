@@ -1,6 +1,6 @@
 {
   "name": "solipsism",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Game-world database for bringing real-time multi-user support to your VR metaverse",
   "main": "src/Solipsism.js",
   "scripts": {
