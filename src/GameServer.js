@@ -16,11 +16,14 @@ function GameServer (world) {
  */
 GameServer.prototype.addSocketClient = function (socket) {
   var sync = new WorldSyncer(this.world);
+  var world = this.world;
   sync.connect(new WorldSyncer.Socket(socket));
+
+  var blockedIdentifiers = [];
 
   // Load the meta-data and initialise the client's filter
   sync.getMetadata(function (metadata) {
-    var blockedIdentifiers = metadata.identifierChain;
+    blockedIdentifiers = metadata.identifierChain;
 
     // Since the world is a broadcast filter, the server should broadcast
     // everything except the client's own changes back to it
@@ -36,6 +39,18 @@ GameServer.prototype.addSocketClient = function (socket) {
   // Set up the disconnection handler
   socket.on('disconnect', function(){
     sync.disconnect();
+
+    console.log('disconnection, deleting objects owned by', blockedIdentifiers)
+
+    // Delete any objects owned by the client
+    // (If objects are intended to persist, they should have their owner reassigned
+    world
+      .filterObjects(function (props, gameObject) {
+        return blockedIdentifiers.indexOf(gameObject.owner) !== -1;
+      })
+      .forEach(function (gameObject) {
+        gameObject.delete();
+      });
   });
 
 }

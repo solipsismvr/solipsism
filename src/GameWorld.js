@@ -152,7 +152,7 @@ GameWorld.prototype.filterObjects = function(callback) {
   var result = [];
   var i;
   for(i in this.objects) {
-    if(this.objects[i].batchCreate && callback(this.objects[i].properties)) {
+    if(callback(this.objects[i].properties, this.objects[i])) {
       result.push(this.objects[i]);
     }
   }
