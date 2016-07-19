@@ -11,7 +11,7 @@ function ChangeQueue() {
    */
   this.push = function(changeRecord) {
     // New record
-    if(!changes[changeRecord.id]) {
+    if(!changes[changeRecord.id] || changeRecord.type === 'add') {
       changes[changeRecord.id] = changeRecord;
 
     // Overwritten record

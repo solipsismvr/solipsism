@@ -1,3 +1,5 @@
+var ChangeQueue = require('./ChangeQueue');
+
 /**
  * Synchronise two worlds via message passing
  */
@@ -81,7 +83,11 @@ WorldSyncer.Worker = function(worker) {
  *  - addMessageHandler(handler). handler will be a callback that expects a data payload
  *  - postMessage(message). message will be a data payload
  */
-WorldSyncer.prototype.connect = function (syncInterface) {
+WorldSyncer.prototype.connect = function (syncInterface, options) {
+  var appliedOptions = Object.assign({
+    updateInterval: null
+  }, options || {});
+
   if (this.syncInterface) {
     console.err('Cannot make a 2nd connect() call on a WorldSyncer. Use a 2nd WorldSyncer object');
     return;
@@ -94,12 +100,36 @@ WorldSyncer.prototype.connect = function (syncInterface) {
   // Listen for change events
   syncInterface.addMessageHandler(self.handleMessage.bind(self));
 
+  // Send a list of changes
+  function sendChanges(data) {
+    if(data.length) {
+      syncInterface.postMessage(['worldChange', { changes: data, timestamp: (new Date()).getTime() } ]);
+    }
+  }
+
+  // Map of queued changes by object id
+  if(appliedOptions.updateInterval) {
+    var queuedChanges = new ChangeQueue();
+    this.interval = setInterval(function() {
+      var changes = queuedChanges.flushQueue();
+      console.log('sending changes', changes);
+      sendChanges(changes);
+    }, appliedOptions.updateInterval);
+  }
+
   // Send change events
   this.world.on('worldChange', this.worldChangeListener = function (data) {
     data = data.filter(self.changeRecordFilter);
 
     if(data.length) {
-      syncInterface.postMessage(['worldChange', { changes: data, timestamp: (new Date()).getTime() } ]);
+      // Queued operation
+      if(appliedOptions.updateInterval) {
+        queuedChanges.pushList(data);
+
+      // Direct operation
+      } else {
+        sendChanges(data);
+      }
     }
   });
 }
@@ -114,6 +144,11 @@ WorldSyncer.prototype.disconnect = function () {
   }
 
   this.syncInterface.removeMessageHandler();
+
+  if(this.interval) {
+    clearInterval(this.interval);
+    this.interval = null;
+  }
 
   delete this.syncInterface;
 }

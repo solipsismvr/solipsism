@@ -259,6 +259,17 @@ when you have 2 GameWorlds connect, but once you have multiple clients, the serv
 The GameServer class provides the implementation of this logic, setting the GameWorld to broadcast all changes, and
 then providing the approprirate client-specific filter when creating a new WorldSyncer.
 
+### Limit the traffic volume
+
+Sending 60-90 updates a second of the avatar position is likely to overwhelm the web socket and lead to degraded
+and inconsistent performance. We can get a good result with much less frequent updates, e.g. 10/second.
+
+If you provide the `updateInterval` option as part of the 2nd argument to `sync.connect()`, we can cache updates
+and send them periodically. The value is in milliseconds, so 100 will mean 10/second.
+
+```js
+sync.connect(new WorldSyncer.Socket(socket), { updateInterval: 100 });
+```
 
 Web Workers
 -----------
