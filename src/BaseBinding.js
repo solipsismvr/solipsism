@@ -110,7 +110,7 @@ BaseBinding.prototype.updateGameObject = function (gameObject, properties) {
     for(name in this.propertyHandlers) {
       handler = this.propertyHandlers[name];
       if (typeof properties[name] !== 'undefined') {
-        (handler.bind(this))(mesh, properties[name]);
+        (handler.bind(this))(mesh, properties[name], gameObject);
       }
     }
   }

@@ -41,6 +41,19 @@ function ThreeBinding (THREE, scene) {
     mesh.scale.set(scale, scale, scale);
   });
 
+  var visibilityHandler = function (mesh, dummy, gameObject) {
+    if(gameObject.properties.invisibleTo && gameObject.properties.invisibleTo.length) {
+      mesh.visible = gameObject.properties.visible
+        && gameObject.properties.invisibleTo.indexOf(gameObject.world.identifier) === -1;
+    } else {
+      mesh.visible = gameObject.properties.visible;
+    }
+  };
+
+  // Either of these properties can trigger that handler
+  this.addPropertyHandler('visible', visibilityHandler);
+  this.addPropertyHandler('invisibleTo', visibilityHandler);
+
   // Propoerty renderers let us handle sub-sections of the property payload
   // In this example, geometry should set to a JSON object with a 'type' property
 
