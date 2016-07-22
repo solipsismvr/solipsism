@@ -162,7 +162,7 @@ world.add({
 Adding physics
 --------------
 
-As well as rendering scenes, bindings can also be used to incorporate physics. A separate package, `silverstripe-ammo`,
+As well as rendering scenes, bindings can also be used to incorporate physics. A separate package, [solipsism-ammo](https://github.com/sminnee/solipsism-ammo),
 provdies integration with the Ammo.js physics engine.
 
 To add physics to your scene, first set up the binding:
