@@ -10,6 +10,8 @@ you can write bindings between the Solipsism GameWorld and any representation yo
 For example, you could bind to different representations of voxel objects, a limited number of pre-suppored 3D shapes,
 or arbitrary meshes for CSG editing.
 
+Companion projects: [solipsism-webvr](https://github.com/solipsismvr/solipsism-webvr) | [solipsism-ammo](https://github.com/solipsismvr/solipsism-ammo)
+
 How it works
 ------------
 
