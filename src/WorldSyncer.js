@@ -1,4 +1,5 @@
 var ChangeQueue = require('./ChangeQueue');
+var SocketCleaner = require('./SocketCleaner');
 
 /**
  * Synchronise two worlds via message passing
@@ -84,8 +85,9 @@ WorldSyncer.Worker = function(worker) {
  *  - postMessage(message). message will be a data payload
  */
 WorldSyncer.prototype.connect = function (syncInterface, options) {
-  var appliedOptions = Object.assign({
-    updateInterval: null
+  this.options = Object.assign({
+    updateInterval: null,
+    socketCleaner: true,
   }, options || {});
 
   if (this.syncInterface) {
@@ -108,12 +110,18 @@ WorldSyncer.prototype.connect = function (syncInterface, options) {
   }
 
   // Map of queued changes by object id
-  if(appliedOptions.updateInterval) {
+  if(self.options.updateInterval) {
     var queuedChanges = new ChangeQueue();
-    this.interval = setInterval(function() {
+
+    var changeSender = function () {
       var changes = queuedChanges.flushQueue();
       sendChanges(changes);
-    }, appliedOptions.updateInterval);
+      if (self.options.updateInterval) {
+        self.interval = setTimeout(changeSender, self.options.updateInterval);
+      }
+    }
+
+    self.interval = setTimeout(changeSender, self.options.updateInterval);
   }
 
   // Send change events
@@ -122,7 +130,7 @@ WorldSyncer.prototype.connect = function (syncInterface, options) {
 
     if(data.length) {
       // Queued operation
-      if(appliedOptions.updateInterval) {
+      if(self.options.updateInterval) {
         queuedChanges.pushList(data);
 
       // Direct operation
@@ -131,6 +139,27 @@ WorldSyncer.prototype.connect = function (syncInterface, options) {
       }
     }
   });
+
+  // Set up socket cleaning
+  if(self.options.socketCleaner) {
+    this.socketCleaner = new SocketCleaner({
+      extrapolationThreshold: 20,
+      slowDownThreshold: 100,
+    });
+    this.socketCleaner.on('slowDown', function() {
+      console.log('send requestLessData');
+      syncInterface.postMessage(['requestLessData']);
+    });
+    this.socketCleaner.on('speedUp', function() {
+      console.log('send requestMoreData');
+      syncInterface.postMessage(['requestMoreData']);
+    });
+  } else {
+    this.socketCleaner = {
+      logTime: function() {},
+      setExtrapolator: function() {},
+    };
+  }
 }
 
 /**
@@ -145,8 +174,13 @@ WorldSyncer.prototype.disconnect = function () {
   this.syncInterface.removeMessageHandler();
 
   if(this.interval) {
-    clearInterval(this.interval);
+    clearTimeout(this.interval);
     this.interval = null;
+  }
+
+  if(this.socketCleaner) {
+    this.socketCleaner.stop();
+    delete this.socketCleaner;
   }
 
   delete this.syncInterface;
@@ -180,18 +214,7 @@ WorldSyncer.prototype.handleMessage = function (message) {
         }
       });
 
-      // If we have an extrapolator, let's use it to reduce jitter
-      if(this.extrapolator) {
-        timeDiff = (new Date().getTime() - message[1].timestamp);
-
-        // If we've gotten ahead of the server by more than 10ms, due to server message delays
-        if(this.timeDiff && (timeDiff - this.timeDiff) > 20) {
-          this.extrapolator(timeDiff - this.timeDiff);
-
-        } else {
-          this.timeDiff = timeDiff;
-        }
-      }
+      this.socketCleaner.logTime(message[1].timestamp);
 
       self.world.flushQueue();
       break;
@@ -203,12 +226,28 @@ WorldSyncer.prototype.handleMessage = function (message) {
 
     case 'requestMetadata':
       console.log('sending metadata');
-      this.syncInterface.postMessage(['metadata', this.world.getMetadata()]);
+      this.syncInterface.postMessage(['metadataChange', this.world.getMetadata()]);
       break;
 
-    case 'metadata':
+    case 'metadataChange':
       console.log('received metadata');
       this.setMetadata(message[1]);
+      break;
+
+    // The other side is asking for less data to be sent
+    // Slow down the rate of updates
+    case 'requestLessData':
+      if(this.options.updateInterval) {
+        this.options.updateInterval = Math.round(this.options.updateInterval * 1.2);
+      }
+      break;
+
+    // The other side is asking for more data to be sent
+    // Speed up the rate of updates
+    case 'requestMoreData':
+      if(this.options.updateInterval) {
+        this.options.updateInterval = Math.round(this.options.updateInterval / 1.2);
+      }
       break;
 
     default:
@@ -233,7 +272,7 @@ WorldSyncer.prototype.setChangeRecordFilter = function (changeRecordFilter) {
  * has been received from another gameworld
  */
 WorldSyncer.prototype.setExtrapolator = function (extrapolator) {
-  this.extrapolator = extrapolator;
+  this.socketCleaner.setExtrapolator(extrapolator);
 }
 
 WorldSyncer.prototype.getMetadata = function (callback) {

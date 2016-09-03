@@ -17,7 +17,7 @@ function GameServer (world) {
 GameServer.prototype.addSocketClient = function (socket) {
   var sync = new WorldSyncer(this.world);
   var world = this.world;
-  sync.connect(new WorldSyncer.Socket(socket));
+  sync.connect(new WorldSyncer.Socket(socket), { updateInterval: 100 });
 
   var blockedIdentifiers = [];
 

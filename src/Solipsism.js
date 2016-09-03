@@ -8,6 +8,7 @@ module.exports = {
   WorkerSyncer: require('./WorldSyncer').Worker,
   WorkerParentSyncer: require('./WorldSyncer').WorkerParent,
   SocketSyncer:  require('./WorldSyncer').Socket,
+  SocketCleaner:  require('./SocketCleaner'),
 
   ThreeBinding: require('./ThreeBinding'),
 };
